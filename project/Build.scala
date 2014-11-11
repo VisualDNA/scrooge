@@ -64,7 +64,7 @@ object Scrooge extends Build {
  }
  val mavenCredentials = Path.userHome / ".m2" / "settings.xml"
  loadMavenCredentials(mavenCredentials.asFile)
- }
+ },
 
 
     libraryDependencies ++= Seq(
