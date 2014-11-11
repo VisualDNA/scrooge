@@ -5,7 +5,7 @@
   <artifactId>scrooge-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>scrooge-maven-plugin</name>
-  <version>3.17.0</version>
+  <version>3.17.0-VDNA-1</version>
   <prerequisites>
     <maven>2.0.6</maven>
   </prerequisites>
@@ -22,18 +22,20 @@
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
-  <distributionManagement>
-    <snapshotRepository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype OSS</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>sonatype-nexus-staging</id>
-      <name>Nexus Release Repository</name>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
+    <distributionManagement>
+        <repository>
+            <id>visualdna-releases</id>
+            <name>VisualDNA Releases</name>
+            <url>https://maven.visualdna.com/nexus/content/repositories/releases</url>
+            <layout>default</layout>
+        </repository>
+        <snapshotRepository>
+            <id>visualdna-snapshots</id>
+            <name>VisualDNA Snapshots</name>
+            <url>https://maven.visualdna.com/nexus/content/repositories/snapshots</url>
+            <layout>default</layout>
+        </snapshotRepository>
+    </distributionManagement>
   <developers>
     <developer>
       <name>Twitter CSL</name>
@@ -217,7 +219,7 @@
     <dependency>
       <groupId>com.twitter</groupId>
       <artifactId>scrooge-generator_2.10</artifactId>
-      <version>3.17.0</version>
+      <version>3.17.0-VDNA-1</version>
     </dependency>
   </dependencies>
   <reporting>
