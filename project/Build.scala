@@ -33,33 +33,6 @@ credentials in ThisBuild ++= {
   val compileThrift = TaskKey[Seq[File]](
     "compile-thrift", "generate thrift needed for tests")
 
-  lazy val publishM2Configuration =
-    TaskKey[PublishConfiguration]("publish-m2-configuration",
-      "Configuration for publishing to the .m2 repository.")
-
-  lazy val publishM2 =
-    TaskKey[Unit]("publish-m2",
-      "Publishes artifacts to the .m2 repository.")
-
-//  lazy val m2Repo =
-//    Resolver.file("publish-m2-local",
-//      Path.userHome / ".m2" / "repository")
-
-  val dumpClasspath = TaskKey[File](
-    "dump-classpath", "generate a file containing the full classpath")
-
-  val dumpClasspathSettings: Seq[Setting[_]] = Seq(
-    dumpClasspath <<= (
-      baseDirectory,
-      fullClasspath in Runtime
-    ) map { (base, cp) =>
-      val file = new File((base / ".classpath.txt").getAbsolutePath)
-      val out = new java.io.FileWriter(file)
-      try out.write(cp.files.absString) finally out.close()
-      file
-    }
-  )
-
   val thriftSettings: Seq[Setting[_]] = Seq(
     compileThrift <<= (
       streams,
@@ -92,18 +65,6 @@ credentials in ThisBuild ++= {
       "sonatype-public" at "https://oss.sonatype.org/content/groups/public",
       "VisualDNA Releases" at "https://maven.visualdna.com/nexus/content/repositories/releases"
     ),
-
-    publishM2Configuration <<= (packagedArtifacts, checksums in publish, ivyLoggingLevel) map { (arts, cs, level) =>
-      Classpaths.publishConfig(
-        artifacts = arts,
-        ivyFile = None,
-        resolverName = "VisualDNA Releases",
-        checksums = cs,
-        logging = level,
-        overwrite = true)
-    },
-    publishM2 <<= Classpaths.publishTask(publishM2Configuration, deliverLocal),
-//    otherResolvers += m2Repo,
 
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "2.2.2" % "test",
@@ -178,8 +139,8 @@ credentials in ThisBuild ++= {
       sharedSettings
   ).aggregate(
     scroogeGenerator, scroogeCore,
-    scroogeRuntime, scroogeSerializer, scroogeOstrich,
-    scroogeLinter, scroogeScalaz
+    scroogeRuntime,
+    scroogeScalaz
   )
 
   lazy val scroogeGenerator = Project(
@@ -235,48 +196,6 @@ credentials in ThisBuild ++= {
     )
   ).dependsOn(scroogeCore)
 
-  lazy val scroogeOstrich = Project(
-    id = "scrooge-ostrich",
-    base = file("scrooge-ostrich"),
-    settings = Project.defaultSettings ++
-      sharedSettings
-  ).settings(
-    name := "scrooge-ostrich",
-    libraryDependencies ++= Seq(
-      finagle("ostrich4"),
-      finagle("thriftmux"),
-      util("app")
-    )
-  ).dependsOn(scroogeRuntime)
-
-  lazy val scroogeSerializer = Project(
-    id = "scrooge-serializer",
-    base = file("scrooge-serializer"),
-    settings = Project.defaultSettings ++
-      sharedSettings
-  ).settings(
-    name := "scrooge-serializer",
-    libraryDependencies ++= Seq(
-      util("codec"),
-      "org.apache.thrift" % "libthrift" % "0.9.3-VDNA-2" % "provided"
-    ),
-    crossScalaVersions += "2.11.2"
-  ).dependsOn(scroogeCore)
-
-  lazy val scroogeSbtPlugin = Project(
-    id = "scrooge-sbt-plugin",
-    base = file("scrooge-sbt-plugin"),
-    settings = Project.defaultSettings ++
-      sharedSettings //++
-      //bintrayPublishSettings
-  ).settings(
-    sbtPlugin := true,
-    publishMavenStyle := false,
-//    repository in bintray := "sbt-plugins",
-    licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html"))
-    //bintrayOrganization in bintray := Some("twittercsl")
-  ).dependsOn(scroogeGenerator)
-  
   lazy val scroogeScalaz = Project(
     id = "scrooge-scalaz",
     base = file("scrooge-scalaz"),
@@ -291,73 +210,4 @@ credentials in ThisBuild ++= {
     crossScalaVersions += "2.11.2"
   ).dependsOn(scroogeCore)
 
-  lazy val scroogeLinter = Project(
-    id = "scrooge-linter",
-    base = file("scrooge-linter"),
-    settings = Project.defaultSettings ++
-      sharedSettings ++
-      assemblySettings
-  ).settings(
-    name := "scrooge-linter"
-  ).dependsOn(scroogeGenerator)
-
-  val benchThriftSettings: Seq[Setting[_]] = Seq(
-    compileThrift <<= (
-      streams,
-      baseDirectory,
-      dependencyClasspath,
-      sourceManaged
-    ) map { (out, base, cp, outputDir) =>
-      val cmd = "%s %s %s %s".format(
-        (base / "src" / "scripts" / "gen-test-thrift").getAbsolutePath,
-        cp.files.absString,
-        outputDir.getAbsolutePath,
-        base.getAbsolutePath)
-
-      out.log.info(cmd)
-      cmd ! out.log
-
-      (outputDir ** "*.scala").get.toSeq ++
-      (outputDir ** "*.java").get.toSeq
-    },
-    sourceGenerators <+= compileThrift
-  )
-
-  lazy val scroogeBenchmark = Project(
-    id = "scrooge-benchmark",
-    base = file("scrooge-benchmark"),
-    settings = Project.defaultSettings ++
-      inConfig(Compile)(benchThriftSettings) ++
-      sharedSettings ++
-      dumpClasspathSettings
-  ).settings(
-    libraryDependencies ++= Seq(
-      util("app"),
-      "com.google.caliper" % "caliper" % "0.5-rc1"
-    )
-  ).dependsOn(scroogeGenerator, scroogeRuntime)
-
-  lazy val scroogeDoc = Project(
-    id = "scrooge-doc",
-    base = file("doc"),
-    settings =
-      Project.defaultSettings ++
-      sharedSettings ++
-      site.settings ++
-      site.sphinxSupport() ++
-      Seq(
-        scalacOptions in doc <++= (version).map(v => Seq("-doc-title", "Scrooge", "-doc-version", v)),
-        includeFilter in Sphinx := ("*.html" | "*.png" | "*.js" | "*.css" | "*.gif" | "*.txt")
-      )
-    ).configs(DocTest).settings(
-      inConfig(DocTest)(Defaults.testSettings): _*
-    ).settings(
-      unmanagedSourceDirectories in DocTest <+= baseDirectory { _ / "src/sphinx/code" },
-
-      // Make the "test" command run both, test and doctest:test
-      test <<= Seq(test in Test, test in DocTest).dependOn
-    )
-
-  /* Test Configuration for running tests on doc sources */
-  lazy val DocTest = config("testdoc") extend(Test)
 }
