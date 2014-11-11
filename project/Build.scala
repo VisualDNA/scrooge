@@ -94,7 +94,8 @@ credentials in ThisBuild ++= {
     scalaVersion := "2.10.4",
 
     resolvers ++= Seq(
-      "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
+      "sonatype-public" at "https://oss.sonatype.org/content/groups/public",
+      "VisualDNA Releases" at "https://maven.visualdna.com/nexus/content/repositories/releases"
     ),
 
     publishM2Configuration <<= (packagedArtifacts, checksums in publish, ivyLoggingLevel) map { (arts, cs, level) =>
