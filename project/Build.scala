@@ -13,20 +13,6 @@ object Scrooge extends Build {
   val utilVersion = "6.22.0"
   val finagleVersion = "6.22.0"
 
-credentials in ThisBuild ++= {
- val sonatype = ("Sonatype Nexus Repository Manager", "maven.visualdna.com")
- def loadMavenCredentials(file: java.io.File): Seq[Credentials] = {
- xml.XML.loadFile(file) \ "servers" \ "server" map (s => {
- val host = (s \ "id").text
- val realm = sonatype._1
- val hostToUse = "maven.visualdna.com"
- Credentials(realm, hostToUse, (s \ "username").text, (s \ "password").text)
- })
- }
- val mavenCredentials = Path.userHome / ".m2" / "settings.xml"
- loadMavenCredentials(mavenCredentials.asFile)
- }
-
   def util(which: String) = "com.twitter" %% ("util-"+which) % utilVersion
   def finagle(which: String) = "com.twitter" %% ("finagle-"+which) % finagleVersion
 
@@ -65,6 +51,21 @@ credentials in ThisBuild ++= {
       "sonatype-public" at "https://oss.sonatype.org/content/groups/public",
       "VisualDNA Releases" at "https://maven.visualdna.com/nexus/content/repositories/releases"
     ),
+    
+    credentials ++= {
+ val sonatype = ("Sonatype Nexus Repository Manager", "maven.visualdna.com")
+ def loadMavenCredentials(file: java.io.File): Seq[Credentials] = {
+ xml.XML.loadFile(file) \ "servers" \ "server" map (s => {
+ val host = (s \ "id").text
+ val realm = sonatype._1
+ val hostToUse = "maven.visualdna.com"
+ Credentials(realm, hostToUse, (s \ "username").text, (s \ "password").text)
+ })
+ }
+ val mavenCredentials = Path.userHome / ".m2" / "settings.xml"
+ loadMavenCredentials(mavenCredentials.asFile)
+ }
+
 
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "2.2.2" % "test",
