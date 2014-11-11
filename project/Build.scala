@@ -13,6 +13,25 @@ object Scrooge extends Build {
   val utilVersion = "6.22.0"
   val finagleVersion = "6.22.0"
 
+credentials in ThisBuild ++= {
+ val sonatype = ("Sonatype Nexus Repository Manager", "maven.visualdna.com")
+ def loadMavenCredentials(file: java.io.File): Seq[Credentials] = {
+ xml.XML.loadFile(file) \ "servers" \ "server" map (s => {
+ val host = (s \ "id").text
+ val realm = sonatype._1
+ val hostToUse = "maven.visualdna.com"
+ Credentials(realm, hostToUse, (s \ "username").text, (s \ "password").text)
+ })
+ }
+ val ivyCredentials = Path.userHome / ".ivy2" / ".credentials"
+ val mavenCredentials = Path.userHome / ".m2" / "settings.xml"
+ (ivyCredentials.asFile, mavenCredentials.asFile) match {
+ case (ivy, _) if ivy.canRead => Credentials(ivy) :: Nil
+ case (_, mvn) if mvn.canRead => loadMavenCredentials(mvn)
+ case _ => Nil
+ }
+ }
+
   def util(which: String) = "com.twitter" %% ("util-"+which) % utilVersion
   def finagle(which: String) = "com.twitter" %% ("finagle-"+which) % finagleVersion
 
@@ -126,11 +145,11 @@ object Scrooge extends Build {
         </developer>
       </developers>),
     publishTo <<= version { (v: String) =>
-      val nexus = "https://oss.sonatype.org/"
-      if (v.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else
-        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+      val nexus = "https://maven.visualdna.com/nexus/content/repositories/"
+        if (v.trim.endsWith("SNAPSHOT"))
+          Some("snapshots" at nexus + "snapshots")
+        else
+          Some("releases" at nexus + "releases")
     },
 
     resourceGenerators in Compile <+=
