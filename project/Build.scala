@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
-import bintray.Plugin._
-import bintray.Keys._
+//import bintray.Plugin._
+//import bintray.Keys._
 import com.typesafe.sbt.SbtSite.site
 import com.typesafe.sbt.site.SphinxSupport.Sphinx
 import net.virtualvoid.sbt.graph.Plugin.graphSettings // For dependency-graph
@@ -272,14 +272,14 @@ credentials in ThisBuild ++= {
     id = "scrooge-sbt-plugin",
     base = file("scrooge-sbt-plugin"),
     settings = Project.defaultSettings ++
-      sharedSettings ++
-      bintrayPublishSettings
+      sharedSettings //++
+      //bintrayPublishSettings
   ).settings(
     sbtPlugin := true,
     publishMavenStyle := false,
-    repository in bintray := "sbt-plugins",
-    licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html")),
-    bintrayOrganization in bintray := Some("twittercsl")
+//    repository in bintray := "sbt-plugins",
+    licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html"))
+    //bintrayOrganization in bintray := Some("twittercsl")
   ).dependsOn(scroogeGenerator)
   
   lazy val scroogeScalaz = Project(
