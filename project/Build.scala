@@ -46,9 +46,9 @@ credentials in ThisBuild ++= {
     TaskKey[Unit]("publish-m2",
       "Publishes artifacts to the .m2 repository.")
 
-  lazy val m2Repo =
-    Resolver.file("publish-m2-local",
-      Path.userHome / ".m2" / "repository")
+//  lazy val m2Repo =
+//    Resolver.file("publish-m2-local",
+//      Path.userHome / ".m2" / "repository")
 
   val dumpClasspath = TaskKey[File](
     "dump-classpath", "generate a file containing the full classpath")
@@ -102,13 +102,13 @@ credentials in ThisBuild ++= {
       Classpaths.publishConfig(
         artifacts = arts,
         ivyFile = None,
-        resolverName = m2Repo.name,
+        resolverName = "VisualDNA Releases",
         checksums = cs,
         logging = level,
         overwrite = true)
     },
     publishM2 <<= Classpaths.publishTask(publishM2Configuration, deliverLocal),
-    otherResolvers += m2Repo,
+//    otherResolvers += m2Repo,
 
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "2.2.2" % "test",
