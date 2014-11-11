@@ -5,7 +5,7 @@
   <artifactId>scrooge-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>scrooge-maven-plugin</name>
-  <version>3.17.0-VDNA-1</version>
+  <version>3.17.0-VDNA-2</version>
   <prerequisites>
     <maven>2.0.6</maven>
   </prerequisites>
@@ -36,6 +36,14 @@
             <layout>default</layout>
         </snapshotRepository>
     </distributionManagement>
+    <repositories>
+        <repository>
+            <id>visualdna-releases</id>
+            <name>VisualDNA Releases</name>
+            <url>https://maven.visualdna.com/nexus/content/repositories/releases</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
   <developers>
     <developer>
       <name>Twitter CSL</name>
@@ -219,7 +227,7 @@
     <dependency>
       <groupId>com.twitter</groupId>
       <artifactId>scrooge-generator_2.10</artifactId>
-      <version>3.17.0-VDNA-1</version>
+      <version>3.17.0-VDNA-2</version>
     </dependency>
   </dependencies>
   <reporting>
