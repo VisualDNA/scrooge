@@ -13,7 +13,7 @@ object Scrooge extends Build {
   val utilVersion = "6.22.0"
   val finagleVersion = "6.22.0"
 
-credentials in ThisBuild += {
+credentials in ThisBuild ++= {
  val sonatype = ("Sonatype Nexus Repository Manager", "maven.visualdna.com")
  def loadMavenCredentials(file: java.io.File): Seq[Credentials] = {
  xml.XML.loadFile(file) \ "servers" \ "server" map (s => {
