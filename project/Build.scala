@@ -9,7 +9,7 @@ import sbtassembly.Plugin._
 import AssemblyKeys._
 
 object Scrooge extends Build {
-  val libVersion = "3.17.0-VDNA-2"
+  val libVersion = "3.17.0-VDNA-3"
   val utilVersion = "6.22.0"
   val finagleVersion = "6.22.0"
 
@@ -157,7 +157,7 @@ object Scrooge extends Build {
     libraryDependencies ++= Seq(
       util("core") exclude("org.mockito", "mockito-all"),
       util("codec") exclude("org.mockito", "mockito-all"),
-      "org.apache.thrift" % "libthrift" % "0.9.3-VDNA-2",
+      "org.apache.thrift" % "libthrift" % "0.9.3-VDNA-3",
       "com.github.scopt" %% "scopt" % "2.1.0",
       "com.novocode" % "junit-interface" % "0.8" % "test->default" exclude("org.mockito", "mockito-all"),
       "com.github.spullara.mustache.java" % "compiler" % "0.8.12",
@@ -180,7 +180,7 @@ object Scrooge extends Build {
   ).settings(
     name := "scrooge-core",
     libraryDependencies ++= Seq(
-      "org.apache.thrift" % "libthrift" % "0.9.3-VDNA-2" % "provided"
+      "org.apache.thrift" % "libthrift" % "0.9.3-VDNA-3" % "provided"
     ),
     crossScalaVersions += "2.11.2"
   )
@@ -205,7 +205,7 @@ object Scrooge extends Build {
   ).settings(
     name := "scrooge-scalaz",
     libraryDependencies ++= Seq(
-      "org.apache.thrift" % "libthrift" % "0.9.3-VDNA-2",
+      "org.apache.thrift" % "libthrift" % "0.9.3-VDNA-3",
       "org.scalaz" %% "scalaz-concurrent" % "7.1.0"
     ),
     crossScalaVersions += "2.11.2"
