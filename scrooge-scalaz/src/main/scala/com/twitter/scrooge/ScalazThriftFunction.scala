@@ -11,11 +11,13 @@ import scalaz._
 import scalaz.Scalaz._
 import org.apache.thrift.server.AbstractNonblockingServer
 import scala.reflect.ClassTag
+import kamon.trace.TraceRecorder
+import akka.actor.ActorSystem
 
 /**
  * TODO: common code between this and ThriftFunction could be factored out
  */
-abstract class ScalazThriftFunction[I, T <: ThriftStruct](methodName: String)(implicit ct: ClassTag[I]) extends AsyncThriftFunction[I] {
+abstract class ScalazThriftFunction[I, T <: ThriftStruct](methodName: String)(implicit ct: ClassTag[I], as: ActorSystem) extends AsyncThriftFunction[I] {
   val traceName = s"${ct.getClass.getSimpleName}.$methodName"
 
   protected val oneWay = false
@@ -25,42 +27,45 @@ abstract class ScalazThriftFunction[I, T <: ThriftStruct](methodName: String)(im
   protected def getResult(iface: I, args: T): Task[ThriftStruct]
 
   def process(seqid: Int, buffer: AbstractNonblockingServer#AsyncFrameBuffer, iface: I): Unit = {
-    val in = buffer.getInputProtocol()
-    val out = buffer.getOutputProtocol()
-    val args = try {
-      decode(in)
-    } catch {
-      case e: TProtocolException ⇒ {
-        in.readMessageEnd()
-        val x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage())
-        out.writeMessageBegin(new TMessage(methodName, TMessageType.EXCEPTION, seqid))
-        x.write(out)
-        out.writeMessageEnd()
-        out.getTransport().flush()
-        buffer.responseReady()
-        return
-      }
-    }
-    in.readMessageEnd()
-
-    getResult(iface, args).runAsync {
-      case \/-(result) ⇒
-        if (!oneWay) {
-          out.writeMessageBegin(new TMessage(methodName, TMessageType.REPLY, seqid))
-          result.write(out)
+    TraceRecorder.withNewTraceContext(traceName) {
+      val in = buffer.getInputProtocol()
+      val out = buffer.getOutputProtocol()
+      val args = try {
+        decode(in)
+      } catch {
+        case e: TProtocolException ⇒ {
+          in.readMessageEnd()
+          val x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage())
+          out.writeMessageBegin(new TMessage(methodName, TMessageType.EXCEPTION, seqid))
+          x.write(out)
           out.writeMessageEnd()
           out.getTransport().flush()
           buffer.responseReady()
+          return
         }
-      case -\/(e) ⇒
-        val x = new TApplicationException(TApplicationException.INTERNAL_ERROR, "Internal error processing " + methodName)
-        out.writeMessageBegin(new TMessage(methodName, TMessageType.EXCEPTION, seqid))
-        x.write(out)
-        out.writeMessageEnd()
-        out.getTransport().flush()
-        buffer.responseReady()
-    }
+      }
+      in.readMessageEnd()
 
+      getResult(iface, args).runAsync {
+        case \/-(result) ⇒
+          if (!oneWay) {
+            out.writeMessageBegin(new TMessage(methodName, TMessageType.REPLY, seqid))
+            result.write(out)
+            out.writeMessageEnd()
+            out.getTransport().flush()
+            buffer.responseReady()
+          }
+          TraceRecorder.finish()
+        case -\/(e) ⇒
+          val x = new TApplicationException(TApplicationException.INTERNAL_ERROR, "Internal error processing " + methodName)
+          out.writeMessageBegin(new TMessage(methodName, TMessageType.EXCEPTION, seqid))
+          x.write(out)
+          out.writeMessageEnd()
+          out.getTransport().flush()
+          buffer.responseReady()
+          TraceRecorder.finish()
+      }
+    }
   }
 
 }
