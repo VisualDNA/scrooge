@@ -6,10 +6,11 @@ import com.twitter.scrooge.AsyncThriftFunction
 import com.twitter.scrooge.AsyncThriftProcessor
 import com.twitter.scrooge.ThriftStruct
 import scalaz.concurrent.Task
+import akka.actor.ActorSystem
 
 {{docstring}}
 @javax.annotation.Generated(value = Array("com.twitter.scrooge.Compiler"), date = "{{date}}")
-class {{ServiceName}}$ScalazProcessor(iface: {{ServiceName}}[Task]) extends AsyncThriftProcessor[{{ServiceName}}[Task]](iface) {
+class {{ServiceName}}$ScalazProcessor(iface: {{ServiceName}}[Task])(implicit as: ActorSystem) extends AsyncThriftProcessor[{{ServiceName}}[Task]](iface) {
 
   protected val processMap = (
 {{#syncFunctions}}
