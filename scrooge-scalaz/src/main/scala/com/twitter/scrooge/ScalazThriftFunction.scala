@@ -13,11 +13,13 @@ import org.apache.thrift.server.AbstractNonblockingServer
 import scala.reflect.ClassTag
 import kamon.trace.TraceRecorder
 import akka.actor.ActorSystem
+import org.slf4j.LoggerFactory
 
 /**
  * TODO: common code between this and ThriftFunction could be factored out
  */
 abstract class ScalazThriftFunction[I, T <: ThriftStruct](methodName: String)(implicit ct: ClassTag[I], as: ActorSystem) extends AsyncThriftFunction[I] {
+  val log = LoggerFactory.getLogger(getClass)
   val traceName = s"${ct.getClass.getSimpleName}.$methodName"
 
   protected val oneWay = false
@@ -57,6 +59,7 @@ abstract class ScalazThriftFunction[I, T <: ThriftStruct](methodName: String)(im
           }
           TraceRecorder.finish()
         case -\/(e) ⇒
+          log.error("Internal error processing " + methodName, e)
           val x = new TApplicationException(TApplicationException.INTERNAL_ERROR, "Internal error processing " + methodName)
           out.writeMessageBegin(new TMessage(methodName, TMessageType.EXCEPTION, seqid))
           x.write(out)
