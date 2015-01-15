@@ -9,7 +9,7 @@ import sbtassembly.Plugin._
 import AssemblyKeys._
 
 object Scrooge extends Build {
-  val libVersion = "3.17.0-VDNA-5"
+  val libVersion = "3.17.0-VDNA-6"
   val utilVersion = "6.22.0"
   val finagleVersion = "6.22.0"
 
@@ -207,7 +207,8 @@ object Scrooge extends Build {
     libraryDependencies ++= Seq(
       "org.apache.thrift" % "libthrift" % "0.9.3-VDNA-3",
       "org.scalaz" %% "scalaz-concurrent" % "7.1.0",
-      "io.kamon" %% "kamon-core" % "0.3.5"
+      "io.kamon" %% "kamon-core" % "0.3.5",
+      "org.slf4j" % "slf4j-api" % "1.7.10"
     ),
     crossScalaVersions += "2.11.2"
   ).dependsOn(scroogeCore)
