@@ -401,6 +401,7 @@ trait TemplateGenerator extends Generator
         val interfaceFile = new File(packageDir, service.sid.toTitleCase.name + fileExtension)
         val processorFileOpt = processorFile(packageDir, service, serviceOptions)
         val scalazProcessorFileOpt = scalazProcessorFile(packageDir, service, serviceOptions)
+        val scalazSyncProcessorFileOpt = scalazSyncProcessorFile(packageDir, service, serviceOptions)
         val finagleClientFileOpt = finagleClientFile(packageDir, service, serviceOptions)
         val finagleServiceFileOpt = finagleServiceFile(packageDir, service, serviceOptions)
 
