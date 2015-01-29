@@ -302,6 +302,15 @@ class ScalaGenerator(
     options.find(_ == WithScalaz) map { _ =>
       new File(packageDir, service.sid.toTitleCase.name + "$ScalazProcessor" + fileExtension)
     }
+  
+  override def scalazSyncProcessorFile(
+    packageDir: File,
+    service: Service, options:
+    Set[ServiceOption]
+  ): Option[File] =
+    options.find(_ == WithScalaz) map { _ =>
+      new File(packageDir, service.sid.toTitleCase.name + "$ScalazSyncProcessor" + fileExtension)
+    }
 
   override def finagleClientFile(
     packageDir: File,
