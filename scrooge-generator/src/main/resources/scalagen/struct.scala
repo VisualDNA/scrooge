@@ -88,7 +88,7 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
   /**
    * Checks that all required fields are non-null.
    */
-  def validate(_item: {{StructName}}) {
+  def validate(_item: {{StructName}}): Unit = {
 {{#fields}}
 {{#required}}
 {{#nullable}}
@@ -109,7 +109,7 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
 {{/fields|,}}
     )
 
-  override def encode(_item: {{StructName}}, _oproto: TProtocol) {
+  override def encode(_item: {{StructName}}, _oproto: TProtocol): Unit =  {
     _item.write(_oproto)
   }
 
@@ -194,7 +194,7 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
 {{/readWriteInfo}}
   }
 
-  private def {{writeFieldName}}({{valueVariableName}}: {{fieldType}}, _oprot: TProtocol) {
+  private def {{writeFieldName}}({{valueVariableName}}: {{fieldType}}, _oprot: TProtocol): Unit = {
 {{#readWriteInfo}}
     _oprot.writeFieldBegin({{fieldConst}}{{#isEnum}}I32{{/isEnum}})
     {{writeFieldValueName}}({{valueVariableName}}, _oprot)
@@ -202,7 +202,7 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
 {{/readWriteInfo}}
   }
 
-  private def {{writeFieldValueName}}({{valueVariableName}}: {{fieldType}}, _oprot: TProtocol) {
+  private def {{writeFieldValueName}}({{valueVariableName}}: {{fieldType}}, _oprot: TProtocol): Unit = {
 {{#readWriteInfo}}
     {{>writeValue}}
 {{/readWriteInfo}}
@@ -234,7 +234,7 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
 
 {{#withTrait}}
   object Immutable extends ThriftStructCodec3[{{StructName}}] {
-    override def encode(_item: {{StructName}}, _oproto: TProtocol) { _item.write(_oproto) }
+    override def encode(_item: {{StructName}}, _oproto: TProtocol): Unit = { _item.write(_oproto) }
     override def decode(_iprot: TProtocol): {{StructName}} = {{StructName}}.decode(_iprot)
   }
 
@@ -441,7 +441,7 @@ class {{StructName}}(
 {{/fields}}
 {{/withFieldGettersAndSetters}}
 
-  override def write(_oprot: TProtocol) {
+  override def write(_oprot: TProtocol): Unit = {
     {{StructName}}.validate(this)
     _oprot.writeStructBegin(Struct)
 {{#fields}}
