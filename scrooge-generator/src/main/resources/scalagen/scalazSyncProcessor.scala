@@ -29,7 +29,7 @@ class {{ServiceName}}$ScalazSyncProcessor(iface: {{ServiceName}}[Task]) extends 
 {{#hasThrows}}
       try {
 {{/hasThrows}}
-        iface.{{funcName}}({{argNames}}).run
+        {{ServiceName}}.{{funcName}}$result(iface.{{funcName}}({{argNames}}).run)
 {{#hasThrows}}
       } catch {
 {{#throws}}
