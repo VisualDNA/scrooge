@@ -25,11 +25,12 @@ class {{ServiceName}}$ScalazSyncProcessor(iface: {{ServiceName}}[Task]) extends 
       {{ServiceName}}.{{funcName}}$args.decode(in)
     }
 
-    def getResult(iface: {{ServiceName}}[Task], args: {{ServiceName}}.{{funcName}}$args) = 
+    def getResult(iface: {{ServiceName}}[Task], args: {{ServiceName}}.{{funcName}}$args) = {
 {{#hasThrows}}
       try {
 {{/hasThrows}}
-        iface.{{funcName}}({{argNames}}).run
+        val value = iface.{{funcName}}({{argNames}}).run
+        {{ServiceName}}.{{funcName}}$result({{resultNamedArg}})
 {{#hasThrows}}
       } catch {
 {{#throws}}
@@ -38,6 +39,7 @@ class {{ServiceName}}$ScalazSyncProcessor(iface: {{ServiceName}}[Task]) extends 
         }
 {{/hasThrows}}
     }
+  }
 
 {{/syncFunctions}}
 }
