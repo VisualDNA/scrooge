@@ -207,7 +207,7 @@ object Scrooge extends Build {
     libraryDependencies ++= Seq(
       "org.apache.thrift" % "libthrift" % "0.9.3-VDNA-3",
       "org.scalaz" %% "scalaz-concurrent" % "7.1.0",
-      "io.kamon" %% "kamon-core" % "0.3.5",
+      "io.kamon" %% "kamon-core" % "0.4.0",
       "org.slf4j" % "slf4j-api" % "1.7.10"
     ),
     crossScalaVersions += "2.11.2"
