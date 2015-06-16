@@ -11,7 +11,7 @@ import scalaz._
 import scalaz.Scalaz._
 import org.apache.thrift.server.AbstractNonblockingServer
 import scala.reflect.ClassTag
-import Kamon.tracer
+import kamon.Kamon.tracer
 import akka.actor.ActorSystem
 import org.slf4j.LoggerFactory
 
